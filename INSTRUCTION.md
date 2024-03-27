@@ -19,9 +19,9 @@ ________________________________________________________________________________
 - [ ] Basic encryption and decryption of files using the RSA keys.
 ### Application 2:
 ##### Functionality 1:
-- [ ] Ability to enter PIN number to generate private RSA key, encrypted by PIN and AES alghoritm.
-- [ ] Generating private key
-- [ ] Generating public key
+- [X] Ability to enter PIN number to generate private RSA key, encrypted by PIN and AES alghoritm.
+- [X] Generating private key
+- [X] Generating public key
 __________________________________________________________________________________
 ## User Stories
 The application must be designed for two users:
