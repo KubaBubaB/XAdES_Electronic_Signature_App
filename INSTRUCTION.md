@@ -9,7 +9,7 @@ ________________________________________________________________________________
 ## Short summary / TODO list:
 ### Application 1:
 ##### Functionality 1:
-- [ ] Application identifies the hardware tool and reads the private key.
+- [X] Application identifies the hardware tool and reads the private key.
 - [ ] Entering the PIN number to decrypt the private RSA key stored on the pendrive.
 - [ ] Signing the document and generating the signing report.(Electronic signature takes form of the XML file, more in User Story A)
 ##### Functionality 2:
