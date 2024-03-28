@@ -10,7 +10,7 @@ ________________________________________________________________________________
 ### Application 1:
 ##### Functionality 1:
 - [X] Application identifies the hardware tool and reads the private key.
-- [ ] Entering the PIN number to decrypt the private RSA key stored on the pendrive.
+- [X] Entering the PIN number to decrypt the private RSA key stored on the pendrive.
 - [ ] Signing the document and generating the signing report.(Electronic signature takes form of the XML file, more in User Story A)
 ##### Functionality 2:
 - [ ] Verification of the signature (using the same application), by having the public key of user A and the document, XML signature file.
