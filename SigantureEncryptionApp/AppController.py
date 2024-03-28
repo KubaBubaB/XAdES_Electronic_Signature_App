@@ -1,6 +1,3 @@
-import os
-import time
-
 import customtkinter as ctk
 import Frames as fr
 import Scripts as Scripts
@@ -35,6 +32,10 @@ class AppController(ctk.CTk):
         Sets the current frame of the application.
     encrypt_key(name: str):
         Prints the name of the key.
+    handle_pin_entry(pin: str, path: str):
+        Handles the pin entry.
+    select_file_to_sign():
+        Handles selecting file to sign.
     """
 
     width_ = 800
@@ -94,18 +95,46 @@ class AppController(ctk.CTk):
             path : str
                 Path to the key.
         """
-        self.set_frame(fr.PinEntryFrame, path)
+        self.set_frame(fr.PinEntryFrame, path, False)
 
-    def handle_pin_entry(self,pin,path):
+    def handle_pin_entry(self, pin, path):
         """
         Handles the pin entry.
+        If key is correct, sets the SelectFileToSignFrame as the current frame.
+        If isn't correct, sets the PinEntryFrame with flag signalising wrong pin as the current frame.
         """
-        key = Scripts.decrypt_RSA_key(pin, path)
-        if key is not None:
-            print(key.export_key().decode())
-            self.rsa_key = key
-            self.text_ = key
-            # self.set_frame(fr.ShowKeyFrame, key)
-        else:
-            print("Error decrypting key")
-            pass
+        try:
+            key = Scripts.decrypt_RSA_key(pin, path)
+            if key is not None:
+                print(key.export_key().decode())
+                self.rsa_key = key
+                self.text_ = key
+                self.set_frame(fr.SelectFileToSignFrame, None, False)
+            else:
+                print("Error decrypting key")
+                pass
+        except ValueError:
+            self.set_frame(fr.PinEntryFrame, path, True)
+
+
+    def select_file_to_sign(self):
+        """
+        Handles selecting file to sign
+        If the extension of file is correct, sets SelectFileToSignFrame with adequate parameters:
+            SelectFileToSignFrame(filePath=path, isExtensionValid=True)
+        And if otherwise with arguments:
+            SelectFileToSignFrame(filePath=path, isExtensionValid=False)
+        """
+        filename = ctk.filedialog.askopenfilename()
+
+        isExtensionValid = Scripts.is_file_valid_to_sign(filename)
+        self.set_frame(fr.SelectFileToSignFrame, filename, isExtensionValid)
+
+
+    def sign_the_file(self, file_path):
+        """
+        Handles SIGN operation. Set
+        """
+        signature = Scripts.sign_file(file_path, self.rsa_key)
+        self.set_frame(fr.FileSignedFrame, signature)
+
