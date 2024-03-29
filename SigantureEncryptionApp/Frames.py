@@ -1,5 +1,8 @@
+import os.path
+
 import customtkinter as ctk
 from PIL import Image, ImageTk
+
 
 class HomeFrame(ctk.CTkFrame):
     """
@@ -35,19 +38,23 @@ class HomeFrame(ctk.CTkFrame):
         label.grid(row=0, column=0, columnspan=2)
 
         sign_button = ctk.CTkButton(self, text="Sign the document", font=("Calibri", 40), width=400, height=60,
-                                command=lambda: appController.sign_document_choosen())
+                                    command=lambda: appController.sign_document_choosen())
         sign_button.grid(row=1, column=0, padx=10, pady=1)
 
-        validate_button = ctk.CTkButton(self, text="Validate signing", font=("Calibri", 40), width=400, height=60)
+        validate_button = ctk.CTkButton(self, text="Verify signing", font=("Calibri", 40), width=400, height=60,
+                                        command=lambda: appController.set_frame(SelectFileToVerifyFrame, None, None))
         validate_button.grid(row=2, column=0, padx=10, pady=1)
 
-        encrypt_button = ctk.CTkButton(self, text="Encryption/decryption", font=("Calibri", 40), width=400,  height=60)
+        encrypt_button = ctk.CTkButton(self, text="Encryption/decryption", font=("Calibri", 40), width=400, height=60)
         encrypt_button.grid(row=3, column=0, padx=10, pady=1)
 
         about_button = ctk.CTkButton(self, text="About app", font=("Calibri", 40), width=400, height=60)
         about_button.grid(row=4, column=0, padx=10, pady=1)
-
-        img = ctk.CTkImage(Image.open("icons/certificate.png"), size=(300, 300))
+        img = None
+        if os.path.exists("icons/certificate.png"):
+            img = ctk.CTkImage(Image.open("icons/certificate.png"), size=(300, 300))
+        elif os.path.exists("SignatureEncryptionApp/icons/certificate.png"):
+            img = ctk.CTkImage(Image.open("icons/certificate.png"), size=(300, 300))
         label = ctk.CTkLabel(master=self, image=img, text="")
         label.grid(row=1, column=1, rowspan=4)
 
@@ -200,7 +207,7 @@ class PinEntryFrame(ctk.CTkFrame):
         zero_button.grid(row=5, column=2, padx=10, pady=10)
 
         clear_button = ctk.CTkButton(self, text="C", font=("Calibri", 30), width=100, height=50,
-                                    command=lambda: self.append_to_pin("-"))
+                                     command=lambda: self.append_to_pin("-"))
         clear_button.grid(row=5, column=1, padx=10, pady=10)
 
         ok_button = ctk.CTkButton(self, text="OK", font=("Calibri", 30), width=100, height=50,
@@ -212,7 +219,7 @@ class PinEntryFrame(ctk.CTkFrame):
             label.grid(row=6, column=2)
 
         return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
-                                command=lambda: appController.set_frame(HomeFrame))
+                                      command=lambda: appController.set_frame(HomeFrame))
         return_button.grid(row=7, column=1, columnspan=3, padx=10, pady=10)
 
     def append_to_pin(self, number):
@@ -249,6 +256,7 @@ class SelectFileToSignFrame(ctk.CTkFrame):
     __init__(master: any, appController, filePath, isExtensionValid):
         Initializes the Frame with a button to select a file to sign from the file's explorer.
     """
+
     def __init__(self, master: any, appController, filePath, isExtensionValid):
         """
         Constructs all the necessary attributes for the SelectFileToSignFrame object.
@@ -270,7 +278,7 @@ class SelectFileToSignFrame(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
 
         select_file_button = ctk.CTkButton(self, text="Select file to sign", font=("Calibri", 30), width=300, height=50,
-                                command=lambda: appController.select_file_to_sign())
+                                           command=lambda: appController.select_file_to_sign())
         select_file_button.grid(row=0, column=0, pady=30, sticky="n")
 
         if filePath is not None:
@@ -288,7 +296,7 @@ class SelectFileToSignFrame(ctk.CTkFrame):
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
 
         return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
-                                command=lambda: appController.set_frame(HomeFrame))
+                                      command=lambda: appController.set_frame(HomeFrame))
         return_button.grid(row=6, column=0, padx=10, pady=30)
 
 
@@ -303,6 +311,7 @@ class FileSignedFrame(ctk.CTkFrame):
     __init__(master: any, appController, filePath, isExtensionValid):
         Initializes the Frame with an information about successful signing and XML signature in textbox.
     """
+
     def __init__(self, master: any, appController, signature):
         """
         Constructs all the necessary attributes for the SelectFileToSignFrame object.
@@ -333,3 +342,208 @@ class FileSignedFrame(ctk.CTkFrame):
         return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
                                       command=lambda: appController.set_frame(HomeFrame))
         return_button.grid(row=6, column=0, padx=10, pady=30)
+
+
+class SelectFileToVerifyFrame(ctk.CTkFrame):
+    """
+        A class used to represent a Frame with a module to select file to verify.
+
+        ...
+
+        Methods
+        -------
+        __init__(master: any, appController, filePath, isExtensionValid):
+            Initializes the Frame with a button to select a file to verify from the file's explorer.
+        """
+
+    def __init__(self, master: any, appController, filePath, isExtensionValid):
+        """
+        Constructs all the necessary attributes for the SelectFileToSignFrame object.
+
+        Parameters
+        ----------
+            master : any
+                The parent widget.
+            appController : any
+                The application controller.
+            filePath : string or None
+                Path to file if it has already been selected
+            isExtensionValid : bool
+                If the extension of selected file is valid. False if None file has been selected.
+        """
+        super().__init__(master)
+
+        self.grid_rowconfigure((0, 1, 2, 4, 5, 6), weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        select_file_button = ctk.CTkButton(self, text="Select file to verify", font=("Calibri", 30), width=300,
+                                           height=50,
+                                           command=lambda: appController.select_file_to_verify())
+        select_file_button.grid(row=0, column=0, pady=30, sticky="n")
+
+        if filePath is not None:
+            filename_label = ctk.CTkLabel(master=self, text=filePath, font=("Calibri", 30))
+            filename_label.grid(row=3, column=0, pady=30, sticky="n")
+            if isExtensionValid:
+                text_label = ctk.CTkLabel(master=self, text="Do you want to verify this file?", font=("Calibri", 30))
+                text_label.grid(row=2, column=0, pady=30, sticky="n")
+                sign_button = ctk.CTkButton(self, text="Next", font=("Calibri", 40), width=300,
+                                            height=50, command=lambda: appController.verify_signature(filePath))
+                sign_button.grid(row=4, column=0, pady=30, sticky="n")
+            else:
+                text_label = ctk.CTkLabel(master=self, text="WRONG EXTENSION FILE", font=("Calibri", 30),
+                                          text_color="red")
+                text_label.grid(row=2, column=0, pady=30, sticky="n")
+
+        return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
+                                      command=lambda: appController.set_frame(HomeFrame))
+        return_button.grid(row=6, column=0, padx=10, pady=30)
+
+
+class SelectPublicKeyFrame(ctk.CTkFrame):
+    """
+            A class used to represent a Frame with a module to select public key.
+
+            ...
+
+            Methods
+            -------
+            __init__(master: any, appController, filePath, isExtensionValid):
+                Initializes the Frame with a button to select a file to verify from the file's explorer.
+            """
+
+    def __init__(self, master: any, appController, filePath, isExtensionValid, keyPath):
+        """
+        Constructs all the necessary attributes for the SelectFileToSignFrame object.
+
+        Parameters
+        ----------
+            master : any
+                The parent widget.
+            appController : any
+                The application controller.
+            filePath : string or None
+                Path to file
+            isExtensionValid : bool
+                If the extension of selected file is valid. False if None file has been selected.
+        """
+        super().__init__(master)
+
+        self.grid_rowconfigure((0, 1, 2, 4, 5, 6), weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        select_file_button = ctk.CTkButton(self, text="Select the public key", font=("Calibri", 30), width=300,
+                                           height=50,
+                                           command=lambda: appController.select_public_key(filePath))
+        select_file_button.grid(row=0, column=0, pady=30, sticky="n")
+
+        if keyPath is not None:
+            filename_label = ctk.CTkLabel(master=self, text=keyPath, font=("Calibri", 30))
+            filename_label.grid(row=3, column=0, pady=30, sticky="n")
+            if isExtensionValid:
+                text_label = ctk.CTkLabel(master=self, text="Do you want to use this key?", font=("Calibri", 30))
+                text_label.grid(row=2, column=0, pady=30, sticky="n")
+                sign_button = ctk.CTkButton(self, text="Next", font=("Calibri", 40), width=300,
+                                            height=50,
+                                            command=lambda: appController.verify_signature2(filePath, keyPath))
+                sign_button.grid(row=4, column=0, pady=30, sticky="n")
+            else:
+                text_label = ctk.CTkLabel(master=self, text="WRONG EXTENSION FILE", font=("Calibri", 30),
+                                          text_color="red")
+                text_label.grid(row=2, column=0, pady=30, sticky="n")
+
+        return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
+                                      command=lambda: appController.set_frame(HomeFrame))
+        return_button.grid(row=6, column=0, padx=10, pady=30)
+
+
+class SelectXMLFrame(ctk.CTkFrame):
+    """
+            A class used to represent a Frame with a module to select public key.
+
+
+            Methods
+            -------
+            __init__(master: any, appController, filePath, isExtensionValid):
+                Initializes the Frame with a button to select a file to verify from the file's explorer.
+            """
+
+    def __init__(self, master: any, appController, filePath, keyPath, isExtensionValid, XMLPath):
+        """
+        Constructs all the necessary attributes for the SelectFileToSignFrame object.
+
+        Parameters
+        ----------
+            master : any
+                The parent widget.
+            appController : any
+                The application controller.
+            filePath : string or None
+                Path to file
+            isExtensionValid : bool
+                If the extension of selected file is valid. False if None file has been selected.
+        """
+        super().__init__(master)
+
+        self.grid_rowconfigure((0, 1, 2, 4, 5, 6), weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        select_file_button = ctk.CTkButton(self, text="Select the signature", font=("Calibri", 30), width=300,
+                                           height=50,
+                                           command=lambda: appController.select_signature(filePath, keyPath))
+        select_file_button.grid(row=0, column=0, pady=30, sticky="n")
+
+        if XMLPath is not None:
+            filename_label = ctk.CTkLabel(master=self, text=XMLPath, font=("Calibri", 30))
+            filename_label.grid(row=3, column=0, pady=30, sticky="n")
+            if isExtensionValid:
+                text_label = ctk.CTkLabel(master=self, text="Do you want to use this signature?", font=("Calibri", 30))
+                text_label.grid(row=2, column=0, pady=30, sticky="n")
+                sign_button = ctk.CTkButton(self, text="Next", font=("Calibri", 40), width=300,
+                                            height=50,
+                                            command=lambda: appController.verify_signature3(filePath, keyPath, XMLPath))
+                sign_button.grid(row=4, column=0, pady=30, sticky="n")
+            else:
+                text_label = ctk.CTkLabel(master=self, text="WRONG EXTENSION FILE", font=("Calibri", 30),
+                                          text_color="red")
+                text_label.grid(row=2, column=0, pady=30, sticky="n")
+
+        return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
+                                      command=lambda: appController.set_frame(HomeFrame))
+        return_button.grid(row=6, column=0, padx=10, pady=30)
+
+
+class VerificationResultFrame(ctk.CTkFrame):
+    """
+    A class used to represent a Frame with an information about verification result.
+    """
+
+    def __init__(self, master: any, appController, result : bool):
+        """
+        Constructs all the necessary attributes for the VerificationResultFrame object.
+
+        Parameters
+        ----------
+            master : any
+                The parent widget.
+            appController : any
+                The application controller.
+            result : bool
+                The result of verification.
+        """
+        super().__init__(master)
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=8)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        if result:
+            text_label = ctk.CTkLabel(self, text="VERIFICATION SUCCESSFUL", font=("Calibri", 30))
+        else:
+            text_label = ctk.CTkLabel(self, text="VERIFICATION FAILED", font=("Calibri", 30), text_color="red")
+        text_label.grid(row=0, column=0, pady=30, sticky="n")
+
+        return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
+                                      command=lambda: appController.set_frame(HomeFrame))
+        return_button.grid(row=2, column=0, padx=10, pady=30)
