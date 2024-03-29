@@ -224,3 +224,62 @@ def verify_signature(file_path, public_key_path, signature_path):
     print(f"Is signature valid: {is_signature_valid}")
 
     return is_signature_valid
+
+
+def encrypt_file(filePath, keyPath):
+    """
+    Function encrypts file (filePath) using key (keyPath) and replaces the original content with the encrypted content.
+
+        Parameters
+        ----------
+        filePath : str
+            The path to file to be encrypted.
+        keyPath : str
+            The path to public RSA key.
+
+        Returns
+        -------
+        encrypted_content
+    """
+
+    with open(filePath, "rb") as file:
+        fileContent = file.read()
+
+    with open(keyPath, "r") as keyFile:
+        publicKey = RSA.import_key(keyFile.read())
+
+    # encrypt file content
+    cipher = PKCS1_OAEP.new(publicKey)
+    encrypted_content = cipher.encrypt(fileContent)
+
+    # replace original content
+    with open(filePath, "wb") as file:
+        file.write(encrypted_content)
+
+    return encrypted_content
+
+
+def decrypt_file(filePath, key):
+    """
+    Function decrypts file (filePath) using key.
+
+        Parameters
+        ----------
+        filePath : str
+            The path to encrypted file
+        key : RSA_key
+            Private RSA key.
+
+        Returns
+        -------
+        decrypted_content : str
+            The string of file content after decryption.
+    """
+
+    with open(filePath, "rb") as file:
+        fileContent = file.read()
+
+    cipher = PKCS1_OAEP.new(key)
+    decrypted_content = cipher.decrypt(fileContent)
+
+    return decrypted_content.decode('utf-8')

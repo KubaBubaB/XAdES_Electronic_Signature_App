@@ -95,13 +95,14 @@ class AppController(ctk.CTk):
             path : str
                 Path to the key.
         """
-        self.set_frame(fr.PinEntryFrame, path, False)
+        self.set_frame(fr.PinEntryFrame, path, False, True, None)
 
-    def handle_pin_entry(self, pin, path):
+    def handle_pin_entry(self, pin, path, isKeyForSignature, fileToDecryptPath):
         """
         Handles the pin entry.
         If key is correct, sets the SelectFileToSignFrame as the current frame.
         If isn't correct, sets the PinEntryFrame with flag signalising wrong pin as the current frame.
+
         """
         try:
             key = Scripts.decrypt_RSA_key(pin, path)
@@ -109,12 +110,15 @@ class AppController(ctk.CTk):
                 print(key.export_key().decode())
                 self.rsa_key = key
                 self.text_ = key
-                self.set_frame(fr.SelectFileToSignFrame, None, False)
+                if isKeyForSignature:
+                    self.set_frame(fr.SelectFileToSignFrame, None, False)
+                else:
+                    self.decrypt_file(self.rsa_key, fileToDecryptPath)
             else:
                 print("Error decrypting key")
                 pass
         except ValueError:
-            self.set_frame(fr.PinEntryFrame, path, True)
+            self.set_frame(fr.PinEntryFrame, path, True, isKeyForSignature, fileToDecryptPath)
 
     def select_file_to_sign(self):
         """
@@ -176,7 +180,7 @@ class AppController(ctk.CTk):
         Handles SIGN operation. Set
         """
         signature = Scripts.sign_file(file_path, self.rsa_key)
-        self.set_frame(fr.FileSignedFrame, signature)
+        self.set_frame(fr.SuccessfulOperationWithDisplay, "SIGNATURE COMPLETED", signature)
 
     def verify_signature2(self, file_path, public_key_path):
         self.set_frame(fr.SelectXMLFrame, file_path, public_key_path, None, None)
@@ -188,3 +192,90 @@ class AppController(ctk.CTk):
         result = Scripts.verify_signature(file_path, public_key_path, signature_path)
         print(result)
         self.set_frame(fr.VerificationResultFrame, result)
+
+    def select_encrypt_decrypt(self):
+        self.set_frame(fr.SelectEncryptDecryptFrame)
+
+    def selected_encrypt(self):
+        self.set_frame(fr.SelectFileToEncryptFrame, None, False)
+
+    def select_file_to_encrypt(self):
+        """
+        Method handles selecting file to be encrypted.
+        It also cheks if file has allowed extension and propagate it to SelectFileToEncryptFrame
+        """
+        filepath = ctk.filedialog.askopenfilename()
+
+        isExtensionValid = Scripts.is_file_valid_to_sign(filepath)
+        self.set_frame(fr.SelectFileToEncryptFrame, filepath, isExtensionValid)
+
+    def selected_file_to_encrypt(self, filepath):
+        """
+        Method sets SelectPublicKeyToEncryptFrame with default parameters
+        """
+        self.set_frame(fr.SelectPublicKeyToEncryptFrame, filepath, None, False)
+
+    def select_public_key_to_encrypt(self, filepath):
+        """
+        Method handles selecting key to sign previously selected file.
+        It also cheks if file has allowed extension and propagate it to SelectPublicKeyToEncryptFrame
+        """
+        keyPath = ctk.filedialog.askopenfilename()
+
+        isExtensionValid = (keyPath.split(".")[-1].lower() == "pem")
+        self.set_frame(fr.SelectPublicKeyToEncryptFrame, filepath, keyPath, isExtensionValid)
+
+    def selected_decrypt(self):
+        self.set_frame(fr.SelectFileToDecryptFrame, None, False)
+
+    def select_file_to_decrypt(self):
+        """
+        Method handles selecting file to be signed.
+        It also cheks if file has allowed extension and propagate it to SelectFileToDecryptFrame
+        """
+        filepath = ctk.filedialog.askopenfilename()
+
+        isExtensionValid = Scripts.is_file_valid_to_sign(filepath)
+        self.set_frame(fr.SelectFileToDecryptFrame, filepath, isExtensionValid)
+
+    def selected_file_to_decrypt(self, filePath):
+        """
+        Checks if there is any external storage connected to the system and finds .pem files.
+        If storage is found, sets the FoundPendriveForDecryptionFrame as the current frame.
+        If no storage is found, sets the NoPendriveForDecryptionFrame as the current frame.
+        """
+        storage = Scripts.check_external_storage()
+        if storage is not None:
+            pems = Scripts.find_pem_files(storage)
+            self.set_frame(fr.FoundPendriveForDecryptionFrame, storage, pems, filePath)
+        else:
+            self.set_frame(fr.NoPendriveForDecryptionFrame, filePath)
+
+    def selected_decrypt_key_for_file_decryption(self, keyPath, filePath):
+        """
+        Switches frame to pin entering with filePath parameter.
+
+        Parameters
+        ----------
+            keyPath : str
+                Path to the key.
+            filePath : str
+                Path to the file.
+        """
+        self.set_frame(fr.PinEntryFrame, keyPath, False, False, filePath)
+
+    def encrypt_file(self, filePath, keyPath):
+        """
+        Method takes file and key paths and calls method Scripts.encrypt_file(),
+        then takes value of encrypted file and propagate it to be shown on SuccessfulOperationWithDisplay
+        """
+        encrypted_file = Scripts.encrypt_file(filePath, keyPath)
+        self.set_frame(fr.SuccessfulOperationWithDisplay, "FILE ENCRYPTION COMPLETED", encrypted_file)
+
+    def decrypt_file(self, key, filePath):
+        """
+        Method takes file path and RSA key and calls method Scripts.decrypt_file(),
+        then takes value of decrypted file and propagate it to be shown on SuccessfulOperationWithDisplay
+        """
+        decrypted_file = Scripts.decrypt_file(filePath, key)
+        self.set_frame(fr.SuccessfulOperationWithDisplay, "FILE DECRYPTION COMPLETED", decrypted_file)
