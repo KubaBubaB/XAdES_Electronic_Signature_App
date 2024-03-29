@@ -41,7 +41,7 @@ class HomeFrame(ctk.CTkFrame):
                                     command=lambda: appController.sign_document_choosen())
         sign_button.grid(row=1, column=0, padx=10, pady=1)
 
-        validate_button = ctk.CTkButton(self, text="Verify signing", font=("Calibri", 40), width=400, height=60,
+        validate_button = ctk.CTkButton(self, text="Verify signature", font=("Calibri", 40), width=400, height=60,
                                         command=lambda: appController.set_frame(SelectFileToVerifyFrame, None, None))
         validate_button.grid(row=2, column=0, padx=10, pady=1)
 
@@ -50,6 +50,7 @@ class HomeFrame(ctk.CTkFrame):
 
         about_button = ctk.CTkButton(self, text="About app", font=("Calibri", 40), width=400, height=60)
         about_button.grid(row=4, column=0, padx=10, pady=1)
+
         img = None
         if os.path.exists("icons/certificate.png"):
             img = ctk.CTkImage(Image.open("icons/certificate.png"), size=(300, 300))
@@ -84,20 +85,28 @@ class NoPendriveFrame(ctk.CTkFrame):
         """
         super().__init__(master)
 
-        self.grid_rowconfigure(0, weight=9)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(1, weight=9)
+        self.grid_rowconfigure((0, 2, 3), weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        label = ctk.CTkLabel(master=self, text="No external memory storage found.", font=("Calibri", 30))
-        label.grid(row=0, column=0, pady=30, sticky="n")
+        label = ctk.CTkLabel(master=self, text="No external memory storage found.", font=("Calibri", 40))
+        label.grid(row=0, column=0, pady=20)
+
+        img = None
+        if os.path.exists("icons/pendrive.png"):
+            img = ctk.CTkImage(Image.open("icons/pendrive.png"), size=(300, 300))
+        elif os.path.exists("SignatureEncryptionApp/icons/pendrive.png"):
+            img = ctk.CTkImage(Image.open("icons/pendrive.png"), size=(300, 300))
+
+        label = ctk.CTkLabel(master=self, image=img, text="")
+        label.grid(row=1, column=0)
 
         button1 = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
                                 command=lambda: appController.set_frame(HomeFrame))
-        button1.grid(row=1, column=0, padx=10, pady=10)
+        button1.grid(row=2, column=0, padx=10, pady=10)
         button2 = ctk.CTkButton(self, text="Try again", font=("Calibri", 30), width=300, height=50,
                                 command=lambda: appController.sign_document_choosen())
-        button2.grid(row=2, column=0, padx=10, pady=10)
+        button2.grid(row=3, column=0, padx=10, pady=10)
 
 
 class FoundPendriveFrame(ctk.CTkFrame):
@@ -129,29 +138,33 @@ class FoundPendriveFrame(ctk.CTkFrame):
         """
         super().__init__(master)
 
-        self.grid_rowconfigure((0, 1, 2, 3, 4), weight=1)
+        self.grid_rowconfigure((0, 1), weight=1)
+        self.grid_rowconfigure((2, 3, 4), weight=2)
         self.grid_rowconfigure(3, weight=2)
         self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=3)
 
-        ctk.CTkLabel(master=self, text="Found storage:", font=("Calibri", 30)).grid(row=0, column=0, pady=30,
-                                                                                    sticky="n")
-        ctk.CTkLabel(master=self, text=name, font=("Calibri", 30)).grid(row=1, column=0, pady=30, sticky="n")
+        ctk.CTkLabel(master=self, text="Found storage:", font=("Calibri", 40)).grid(row=0, column=0, pady=30,
+                                                                                    sticky="n", columnspan=2)
+        ctk.CTkLabel(master=self, text=name, font=("Calibri", 40)).grid(row=1, column=0, pady=30, sticky="n",
+                                                                        columnspan=2)
 
         if pems is None:
             ctk.CTkLabel(master=self, text="No .pem file found", font=("Calibri", 30)).grid(row=2, column=0, pady=30,
-                                                                                            sticky="n")
+                                                                                            sticky="n", columnspan=2)
         else:
-            combobox = ctk.CTkComboBox(master=self, values=pems, font=("Calibri", 30), width=300, height=50)
-            combobox.grid(row=2, column=0, padx=10, pady=10)
+            ctk.CTkLabel(master=self, text="Select key:", font=("Calibri", 30)).grid(row=2, column=0, pady=20)
+            combobox = ctk.CTkComboBox(master=self, values=pems, font=("Calibri", 30), width=500, height=50)
+            combobox.grid(row=2, column=1, padx=10, pady=10)
             combobox.set(pems[0])
 
             button1 = ctk.CTkButton(self, text="Decode selected key", font=("Calibri", 30), width=300, height=50,
                                     command=lambda: appController.decrypt_key(combobox.get()))
-            button1.grid(row=3, column=0, padx=10, pady=10)
+            button1.grid(row=3, column=0, padx=10, pady=10, columnspan=2)
 
         button2 = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
                                 command=lambda: appController.set_frame(HomeFrame))
-        button2.grid(row=4, column=0, padx=10, pady=10)
+        button2.grid(row=4, column=0, padx=10, pady=10, columnspan=2)
 
 
 class PinEntryFrame(ctk.CTkFrame):
@@ -291,9 +304,27 @@ class SelectFileToSignFrame(ctk.CTkFrame):
                                             height=50, command=lambda: appController.sign_the_file(filePath))
                 sign_button.grid(row=4, column=0, pady=30, sticky="n")
             else:
-                text_label = ctk.CTkLabel(master=self, text="WRONG EXTENSION FILE", font=("Calibri", 30),
+                text_label = ctk.CTkLabel(master=self, text="WRONG FILE EXTENSION", font=("Calibri", 30),
                                           text_color="red")
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
+
+                img = None
+                if os.path.exists("icons/doc-fail.png"):
+                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
+                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+
+                label = ctk.CTkLabel(master=self, image=img, text="")
+                label.grid(row=4, column=0)
+        else:
+            img = None
+            if os.path.exists("icons/file.png"):
+                img = ctk.CTkImage(Image.open("icons/file.png"), size=(300, 300))
+            elif os.path.exists("SignatureEncryptionApp/icons/file.png"):
+                img = ctk.CTkImage(Image.open("icons/file.png"), size=(300, 300))
+
+            label = ctk.CTkLabel(master=self, image=img, text="")
+            label.grid(row=2, rowspan=3, column=0)
 
         return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
                                       command=lambda: appController.set_frame(HomeFrame))
@@ -338,6 +369,8 @@ class FileSignedFrame(ctk.CTkFrame):
         textbox = ctk.CTkTextbox(self)
         textbox.grid(row=1, column=0, pady=0, padx=30, sticky='nsew')
         textbox.insert("0.0", signature)
+        textbox.configure(state='disabled')
+
 
         return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
                                       command=lambda: appController.set_frame(HomeFrame))
@@ -382,7 +415,7 @@ class SelectFileToVerifyFrame(ctk.CTkFrame):
         select_file_button.grid(row=0, column=0, pady=30, sticky="n")
 
         if filePath is not None:
-            filename_label = ctk.CTkLabel(master=self, text=filePath, font=("Calibri", 30))
+            filename_label = ctk.CTkLabel(master=self, text=filePath, font=("Calibri", 30), wraplength=700)
             filename_label.grid(row=3, column=0, pady=30, sticky="n")
             if isExtensionValid:
                 text_label = ctk.CTkLabel(master=self, text="Do you want to verify this file?", font=("Calibri", 30))
@@ -391,9 +424,27 @@ class SelectFileToVerifyFrame(ctk.CTkFrame):
                                             height=50, command=lambda: appController.verify_signature(filePath))
                 sign_button.grid(row=4, column=0, pady=30, sticky="n")
             else:
-                text_label = ctk.CTkLabel(master=self, text="WRONG EXTENSION FILE", font=("Calibri", 30),
+                text_label = ctk.CTkLabel(master=self, text="WRONG FILE EXTENSION", font=("Calibri", 30),
                                           text_color="red")
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
+
+                img = None
+                if os.path.exists("icons/doc-fail.png"):
+                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
+                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+
+                label = ctk.CTkLabel(master=self, image=img, text="")
+                label.grid(row=4, column=0)
+        else:
+            img = None
+            if os.path.exists("icons/file.png"):
+                img = ctk.CTkImage(Image.open("icons/file.png"), size=(300, 300))
+            elif os.path.exists("SignatureEncryptionApp/icons/file.png"):
+                img = ctk.CTkImage(Image.open("icons/file.png"), size=(300, 300))
+
+            label = ctk.CTkLabel(master=self, image=img, text="")
+            label.grid(row=2, rowspan=3, column=0)
 
         return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
                                       command=lambda: appController.set_frame(HomeFrame))
@@ -438,7 +489,7 @@ class SelectPublicKeyFrame(ctk.CTkFrame):
         select_file_button.grid(row=0, column=0, pady=30, sticky="n")
 
         if keyPath is not None:
-            filename_label = ctk.CTkLabel(master=self, text=keyPath, font=("Calibri", 30))
+            filename_label = ctk.CTkLabel(master=self, text=keyPath, font=("Calibri", 30), wraplength=700)
             filename_label.grid(row=3, column=0, pady=30, sticky="n")
             if isExtensionValid:
                 text_label = ctk.CTkLabel(master=self, text="Do you want to use this key?", font=("Calibri", 30))
@@ -448,9 +499,27 @@ class SelectPublicKeyFrame(ctk.CTkFrame):
                                             command=lambda: appController.verify_signature2(filePath, keyPath))
                 sign_button.grid(row=4, column=0, pady=30, sticky="n")
             else:
-                text_label = ctk.CTkLabel(master=self, text="WRONG EXTENSION FILE", font=("Calibri", 30),
+                text_label = ctk.CTkLabel(master=self, text="WRONG FILE EXTENSION", font=("Calibri", 30),
                                           text_color="red")
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
+
+                img = None
+                if os.path.exists("icons/doc-fail.png"):
+                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
+                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+
+                label = ctk.CTkLabel(master=self, image=img, text="")
+                label.grid(row=4, column=0)
+        else:
+            img = None
+            if os.path.exists("icons/key.png"):
+                img = ctk.CTkImage(Image.open("icons/key.png"), size=(300, 300))
+            elif os.path.exists("SignatureEncryptionApp/icons/key.png"):
+                img = ctk.CTkImage(Image.open("icons/key.png"), size=(300, 300))
+
+            label = ctk.CTkLabel(master=self, image=img, text="")
+            label.grid(row=2, rowspan=3, column=0)
 
         return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
                                       command=lambda: appController.set_frame(HomeFrame))
@@ -494,7 +563,7 @@ class SelectXMLFrame(ctk.CTkFrame):
         select_file_button.grid(row=0, column=0, pady=30, sticky="n")
 
         if XMLPath is not None:
-            filename_label = ctk.CTkLabel(master=self, text=XMLPath, font=("Calibri", 30))
+            filename_label = ctk.CTkLabel(master=self, text=XMLPath, font=("Calibri", 30), wraplength=700)
             filename_label.grid(row=3, column=0, pady=30, sticky="n")
             if isExtensionValid:
                 text_label = ctk.CTkLabel(master=self, text="Do you want to use this signature?", font=("Calibri", 30))
@@ -504,9 +573,27 @@ class SelectXMLFrame(ctk.CTkFrame):
                                             command=lambda: appController.verify_signature3(filePath, keyPath, XMLPath))
                 sign_button.grid(row=4, column=0, pady=30, sticky="n")
             else:
-                text_label = ctk.CTkLabel(master=self, text="WRONG EXTENSION FILE", font=("Calibri", 30),
+                text_label = ctk.CTkLabel(master=self, text="WRONG FILE EXTENSION", font=("Calibri", 30),
                                           text_color="red")
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
+
+                img = None
+                if os.path.exists("icons/doc-fail.png"):
+                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
+                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+
+                label = ctk.CTkLabel(master=self, image=img, text="")
+                label.grid(row=4, column=0)
+        else:
+            img = None
+            if os.path.exists("icons/certificate.png"):
+                img = ctk.CTkImage(Image.open("icons/certificate.png"), size=(300, 300))
+            elif os.path.exists("SignatureEncryptionApp/icons/certificate.png"):
+                img = ctk.CTkImage(Image.open("icons/certificate.png"), size=(300, 300))
+
+            label = ctk.CTkLabel(master=self, image=img, text="")
+            label.grid(row=2, rowspan=3, column=0)
 
         return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
                                       command=lambda: appController.set_frame(HomeFrame))
@@ -518,7 +605,7 @@ class VerificationResultFrame(ctk.CTkFrame):
     A class used to represent a Frame with an information about verification result.
     """
 
-    def __init__(self, master: any, appController, result : bool):
+    def __init__(self, master: any, appController, result: bool):
         """
         Constructs all the necessary attributes for the VerificationResultFrame object.
 
@@ -538,10 +625,22 @@ class VerificationResultFrame(ctk.CTkFrame):
         self.grid_rowconfigure(2, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        filename = ""
         if result:
-            text_label = ctk.CTkLabel(self, text="VERIFICATION SUCCESSFUL", font=("Calibri", 30))
+            text_label = ctk.CTkLabel(self, text="VERIFICATION SUCCESSFUL", font=("Calibri", 40))
+            filename = "success"
         else:
-            text_label = ctk.CTkLabel(self, text="VERIFICATION FAILED", font=("Calibri", 30), text_color="red")
+            text_label = ctk.CTkLabel(self, text="VERIFICATION FAILED", font=("Calibri", 40), text_color="red")
+            filename = "failure"
+
+        img = None
+        if os.path.exists("icons/" + filename + ".png"):
+            img = ctk.CTkImage(Image.open("icons/" + filename + ".png"), size=(300, 300))
+        elif os.path.exists("SignatureEncryptionApp/icons/" + filename + ".png"):
+            img = ctk.CTkImage(Image.open("icons/" + filename + ".png"), size=(300, 300))
+
+        label = ctk.CTkLabel(master=self, image=img, text="")
+        label.grid(row=1, column=0)
         text_label.grid(row=0, column=0, pady=30, sticky="n")
 
         return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
