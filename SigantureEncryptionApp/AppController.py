@@ -116,7 +116,6 @@ class AppController(ctk.CTk):
         except ValueError:
             self.set_frame(fr.PinEntryFrame, path, True)
 
-
     def select_file_to_sign(self):
         """
         Handles selecting file to sign
@@ -130,6 +129,47 @@ class AppController(ctk.CTk):
         isExtensionValid = Scripts.is_file_valid_to_sign(filename)
         self.set_frame(fr.SelectFileToSignFrame, filename, isExtensionValid)
 
+    def select_file_to_verify(self):
+        """
+        Handles selecting file to verify
+        If the extension of file is correct, sets SelectFileToVerifyFrame with adequate parameters:
+            SelectFileToVerifyFrame(filePath=path, isExtensionValid=True)
+        And if otherwise with arguments:
+            SelectFileToVerifyFrame(filePath=path, isExtensionValid=False)
+        """
+        filename = ctk.filedialog.askopenfilename()
+
+        isExtensionValid = Scripts.is_file_valid_to_sign(filename)
+        self.set_frame(fr.SelectFileToVerifyFrame, filename, isExtensionValid)
+
+    def verify_signature(self, file_path):
+        self.set_frame(fr.SelectPublicKeyFrame, file_path, None, None)
+
+    def select_public_key(self, filepath):
+        """
+        Handles selecting public key.
+        If the extension of file is correct, sets SelectPublicKeyFrame with adequate parameters:
+            SelectPublicKeyFrame(filePath=path, isExtensionValid=True)
+        And if otherwise with arguments:
+            SelectPublicKeyFrame(filePath=path, isExtensionValid=False)
+        """
+        keyname = ctk.filedialog.askopenfilename()
+
+        isExtensionValid = (keyname.split(".")[-1].lower() == "pem")
+        self.set_frame(fr.SelectPublicKeyFrame, filepath, isExtensionValid, keyname)
+
+    def select_signature(self, file_path, public_key_path):
+        """
+        Handles selecting signature.
+        If the extension of file is correct, sets SelectSignatureFrame with adequate parameters:
+            SelectSignatureFrame(filePath=path, isExtensionValid=True)
+        And if otherwise with arguments:
+            SelectSignatureFrame(filePath=path, isExtensionValid=False)
+        """
+        signature = ctk.filedialog.askopenfilename()
+
+        isExtensionValid = (signature.split(".")[-1].lower() == "xml")
+        self.set_frame(fr.SelectXMLFrame, file_path, public_key_path, isExtensionValid, signature)
 
     def sign_the_file(self, file_path):
         """
@@ -138,3 +178,13 @@ class AppController(ctk.CTk):
         signature = Scripts.sign_file(file_path, self.rsa_key)
         self.set_frame(fr.FileSignedFrame, signature)
 
+    def verify_signature2(self, file_path, public_key_path):
+        self.set_frame(fr.SelectXMLFrame, file_path, public_key_path, None, None)
+
+    def verify_signature3(self, file_path, public_key_path, signature_path):
+        """
+        Handles VERIFY operation.
+        """
+        result = Scripts.verify_signature(file_path, public_key_path, signature_path)
+        print(result)
+        self.set_frame(fr.VerificationResultFrame, result)

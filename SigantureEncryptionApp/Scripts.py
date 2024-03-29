@@ -5,12 +5,17 @@ import psutil
 
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Cipher import AES, PKCS1_OAEP
+from Cryptodome.Signature import PKCS1_v1_5
+from Cryptodome.Hash import SHA256
 from Cryptodome.Util.Padding import unpad
 from datetime import datetime
 from uuid import getnode as get_mac
+from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement, tostring, indent
 
 ALLOWED_EXTENSIONS = ["cpp", "txt"]
+
+
 def check_external_storage():
     """
     Checks if there is any external storage connected to the system.
@@ -142,11 +147,11 @@ def sign_file(file_path, rsa_key):
         file_content = file.read()
 
     # calculating hash of file
-    file_hash = hashlib.sha256(file_content).hexdigest()
+    file_hash = SHA256.new(file_content)
 
     # encrypting hash with decrypted private RSA key
-    cipher = PKCS1_OAEP.new(rsa_key)
-    encrypted_hash = cipher.encrypt(file_hash.encode())
+    signer = PKCS1_v1_5.new(rsa_key)
+    signature = signer.sign(file_hash)
 
     # creating XML signature
     signature_xml = Element("XAdES")
@@ -160,7 +165,7 @@ def sign_file(file_path, rsa_key):
     SubElement(user_info, "SigningUserName").text = str(os.getlogin())
     SubElement(user_info, "SigningUserMAC").text = str(hex(get_mac()))
 
-    SubElement(signature_xml, "EncryptedHash").text = base64.b64encode(encrypted_hash).decode()
+    SubElement(signature_xml, "EncryptedHash").text = base64.b64encode(signature).decode()
     SubElement(signature_xml, "Timestamp").text = str(datetime.now())
 
     indent(signature_xml, space='\t', level=0)
@@ -172,3 +177,50 @@ def sign_file(file_path, rsa_key):
         xml_file.write(signature_xml_str)
 
     return signature_xml_str
+
+
+def verify_signature(file_path, public_key_path, signature_path):
+    """
+    Function verifies the signature of the file.
+
+    Parameters
+    ----------
+    file_path : str
+        The path to the file to verify.
+    signature_path : str
+        The path to the signature file.
+    public_key_path : str
+        The path to the public key file.
+
+    Returns
+    -------
+    bool
+        True if the signature is valid, False otherwise.
+    """
+    with open(file_path, "rb") as file:
+        file_content = file.read()
+
+    # calculating hash of file
+    file_hash = SHA256.new(file_content)
+
+    # reading signature
+    with open(signature_path, "r") as signature_file:
+        signature_xml = signature_file.read()
+
+    # parsing XML signature
+    signature_tree = ElementTree.fromstring(signature_xml)
+
+    with open(public_key_path, 'r') as key_file:
+        public_key = RSA.import_key(key_file.read())
+
+    # decrypting hash
+    signature = base64.b64decode(signature_tree.find("EncryptedHash").text)
+
+    # create a new verifier with the public key
+    verifier = PKCS1_v1_5.new(public_key)
+
+    # verify the signature
+    is_signature_valid = verifier.verify(file_hash, signature)
+    print(f"Is signature valid: {is_signature_valid}")
+
+    return is_signature_valid
