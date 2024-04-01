@@ -2,12 +2,9 @@ import customtkinter as ctk
 import Frames as fr
 import Scripts as Scripts
 
-
 class AppController(ctk.CTk):
     """
     A class used to control the application.
-
-    ...
 
     Attributes
     ----------
@@ -103,6 +100,16 @@ class AppController(ctk.CTk):
         If key is correct, sets the SelectFileToSignFrame as the current frame.
         If isn't correct, sets the PinEntryFrame with flag signalising wrong pin as the current frame.
 
+        Parameters
+        ----------
+            pin : str
+                The pin used to encrypt the key.
+            path : str
+                Path to the key.
+            isKeyForSignature : bool
+                A flag to signalise if the key is for signature.
+            fileToDecryptPath : str
+                Path to the file to decrypt.
         """
         try:
             key = Scripts.decrypt_RSA_key(pin, path)
@@ -147,7 +154,37 @@ class AppController(ctk.CTk):
         self.set_frame(fr.SelectFileToVerifyFrame, filename, isExtensionValid)
 
     def verify_signature(self, file_path):
+        """
+        Starts to handle VERIFY operation.
+        :param file_path:
+        :return:
+        """
         self.set_frame(fr.SelectPublicKeyFrame, file_path, None, None)
+
+    def verify_signature2(self, file_path, public_key_path):
+        """
+        Continues to handle VERIFY operation.
+        :param file_path:
+        :param public_key_path:
+        """
+        self.set_frame(fr.SelectXMLFrame, file_path, public_key_path, None, None)
+
+    def verify_signature3(self, file_path, public_key_path, signature_path):
+        """
+        Finishes handling VERIFY operation.
+
+        Parameters
+        ----------
+            file_path : str
+                The path to the file to verify.
+            public_key_path : str
+                The path to the public key file.
+            signature_path : str
+                The path to the signature file.
+        """
+        result = Scripts.verify_signature(file_path, public_key_path, signature_path)
+        # print(result)
+        self.set_frame(fr.VerificationResultFrame, result)
 
     def select_public_key(self, filepath):
         """
@@ -156,6 +193,11 @@ class AppController(ctk.CTk):
             SelectPublicKeyFrame(filePath=path, isExtensionValid=True)
         And if otherwise with arguments:
             SelectPublicKeyFrame(filePath=path, isExtensionValid=False)
+
+        Parameters
+        ----------
+            filepath : str
+                The path to the file.
         """
         keyname = ctk.filedialog.askopenfilename()
 
@@ -169,6 +211,13 @@ class AppController(ctk.CTk):
             SelectSignatureFrame(filePath=path, isExtensionValid=True)
         And if otherwise with arguments:
             SelectSignatureFrame(filePath=path, isExtensionValid=False)
+
+        Parameters
+        ----------
+            file_path : str
+                The path to the file.
+            public_key_path : str
+                The path to the public key file.
         """
         signature = ctk.filedialog.askopenfilename()
 
@@ -177,26 +226,23 @@ class AppController(ctk.CTk):
 
     def sign_the_file(self, file_path):
         """
-        Handles SIGN operation. Set
+        Handles SIGN operation.
+        :param file_path:
         """
         signature = Scripts.sign_file(file_path, self.rsa_key)
         self.set_frame(fr.SuccessfulOperationWithDisplay, "SIGNATURE COMPLETED", signature)
 
-    def verify_signature2(self, file_path, public_key_path):
-        self.set_frame(fr.SelectXMLFrame, file_path, public_key_path, None, None)
-
-    def verify_signature3(self, file_path, public_key_path, signature_path):
-        """
-        Handles VERIFY operation.
-        """
-        result = Scripts.verify_signature(file_path, public_key_path, signature_path)
-        print(result)
-        self.set_frame(fr.VerificationResultFrame, result)
 
     def select_encrypt_decrypt(self):
+        """
+        Method sets SelectEncryptDecryptFrame with default parameters
+        """
         self.set_frame(fr.SelectEncryptDecryptFrame)
 
     def selected_encrypt(self):
+        """
+        Method sets SelectFileToEncryptFrame with default parameters
+        """
         self.set_frame(fr.SelectFileToEncryptFrame, None, False)
 
     def select_file_to_encrypt(self):
@@ -212,6 +258,10 @@ class AppController(ctk.CTk):
     def selected_file_to_encrypt(self, filepath):
         """
         Method sets SelectPublicKeyToEncryptFrame with default parameters
+
+        Parameters
+        ----------
+            filepath : str
         """
         self.set_frame(fr.SelectPublicKeyToEncryptFrame, filepath, None, False)
 
@@ -219,6 +269,10 @@ class AppController(ctk.CTk):
         """
         Method handles selecting key to sign previously selected file.
         It also cheks if file has allowed extension and propagate it to SelectPublicKeyToEncryptFrame
+
+        Parameters
+        ----------
+            filepath : str
         """
         keyPath = ctk.filedialog.askopenfilename()
 
@@ -226,6 +280,9 @@ class AppController(ctk.CTk):
         self.set_frame(fr.SelectPublicKeyToEncryptFrame, filepath, keyPath, isExtensionValid)
 
     def selected_decrypt(self):
+        """
+        Method sets SelectFileToDecryptFrame with default parameters
+        """
         self.set_frame(fr.SelectFileToDecryptFrame, None, False)
 
     def select_file_to_decrypt(self):
@@ -243,6 +300,10 @@ class AppController(ctk.CTk):
         Checks if there is any external storage connected to the system and finds .pem files.
         If storage is found, sets the FoundPendriveForDecryptionFrame as the current frame.
         If no storage is found, sets the NoPendriveForDecryptionFrame as the current frame.
+
+        Parameters
+        ----------
+            filePath : str
         """
         storage = Scripts.check_external_storage()
         if storage is not None:
@@ -268,6 +329,11 @@ class AppController(ctk.CTk):
         """
         Method takes file and key paths and calls method Scripts.encrypt_file(),
         then takes value of encrypted file and propagate it to be shown on SuccessfulOperationWithDisplay
+
+        Parameters
+        ----------
+            filePath : str
+            keyPath : str
         """
         encrypted_file = Scripts.encrypt_file(filePath, keyPath)
         self.set_frame(fr.SuccessfulOperationWithDisplay, "FILE ENCRYPTION COMPLETED", encrypted_file)
@@ -276,6 +342,11 @@ class AppController(ctk.CTk):
         """
         Method takes file path and RSA key and calls method Scripts.decrypt_file(),
         then takes value of decrypted file and propagate it to be shown on SuccessfulOperationWithDisplay
+
+        Parameters
+        ----------
+            key : RSA key
+            filePath : str
         """
         decrypted_file = Scripts.decrypt_file(filePath, key)
         self.set_frame(fr.SuccessfulOperationWithDisplay, "FILE DECRYPTION COMPLETED", decrypted_file)
