@@ -8,7 +8,6 @@ class HomeFrame(ctk.CTkFrame):
     """
     A class used to represent the Home Frame of the application.
 
-    ...
 
     Methods
     -------
@@ -34,23 +33,24 @@ class HomeFrame(ctk.CTkFrame):
         self.grid_rowconfigure(5, weight=2)
         self.grid_columnconfigure((0, 1), weight=1)
 
-        label = ctk.CTkLabel(master=self, text="SIGNATURE ENCRYPTION APP", font=("Georgia", 50))
+        label = ctk.CTkLabel(master=self, text="SIGNATURE ENCRYPTION \n APP", font=("Georgia", 50))
         label.grid(row=0, column=0, columnspan=2)
 
         sign_button = ctk.CTkButton(self, text="Sign the document", font=("Calibri", 40), width=400, height=60,
                                     command=lambda: appController.sign_document_choosen())
-        sign_button.grid(row=1, column=0, padx=10, pady=1)
+        sign_button.grid(row=1, column=0, padx=10, pady=1, columnspan=2)
 
         validate_button = ctk.CTkButton(self, text="Verify signature", font=("Calibri", 40), width=400, height=60,
                                         command=lambda: appController.set_frame(SelectFileToVerifyFrame, None, None))
-        validate_button.grid(row=2, column=0, padx=10, pady=1)
+        validate_button.grid(row=2, column=0, padx=10, pady=1, columnspan=2)
 
         encrypt_button = ctk.CTkButton(self, text="Encryption/decryption", font=("Calibri", 40), width=400, height=60,
                                        command=lambda: appController.select_encrypt_decrypt())
-        encrypt_button.grid(row=3, column=0, padx=10, pady=1)
+        encrypt_button.grid(row=3, column=0, padx=10, pady=1, columnspan=2)
 
-        about_button = ctk.CTkButton(self, text="About app", font=("Calibri", 40), width=400, height=60)
-        about_button.grid(row=4, column=0, padx=10, pady=1)
+        about_button = ctk.CTkButton(self, text="About app", font=("Calibri", 40), width=400, height=60,
+                                     command=lambda: appController.set_frame(AboutFrame))
+        about_button.grid(row=4, column=0, padx=10, pady=1, columnspan=2)
 
         img = None
         if os.path.exists("icons/certificate.png"):
@@ -60,17 +60,59 @@ class HomeFrame(ctk.CTkFrame):
         label = ctk.CTkLabel(master=self, image=img, text="")
         label.grid(row=1, column=1, rowspan=4)
 
-
-class NoPendriveFrame(ctk.CTkFrame):
+class AboutFrame(ctk.CTkFrame):
     """
-    A class used to represent the No Pendrive Frame of the application.
+    A class used to represent the About Frame of the application.
 
-    ...
 
     Methods
     -------
     __init__(master: any, appController):
-        Initializes the No Pendrive Frame with a message and buttons for retry or return to main menu.
+        Initializes the About Frame with information about the application.
+    """
+
+    def __init__(self, master: any, appController):
+        """
+        Constructs all the necessary attributes for the AboutFrame object.
+
+        Parameters
+        ----------
+            master : any
+                The parent widget.
+            appController : any
+                The application controller.
+        """
+        super().__init__(master)
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure((1, 2, 3, 4, 5), weight=2)
+        self.grid_rowconfigure(6, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        label = ctk.CTkLabel(master=self, text="ABOUT APP", font=("Georgia", 50))
+        label.grid(row=0, column=0, pady=20)
+
+        text = "This application allows you to sign and verify documents. " \
+               "It also provides the option to encrypt and decrypt files. " \
+               "The application uses RSA encryption algorithm.\n" \
+               "Authors: \n" \
+               "Aleksander Sarzyniak \n" \
+               "Kuba Lisowski \n"
+
+        text_label = ctk.CTkLabel(master=self, text=text, font=("Calibri", 30), wraplength=750)
+        text_label.grid(row=1, column=0, pady=20)
+
+        return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
+                                      command=lambda: appController.set_frame(HomeFrame))
+        return_button.grid(row=6, column=0, padx=10, pady=10)
+class NoPendriveFrame(ctk.CTkFrame):
+    """
+    A class used to represent the No Pendrive Frame of the application.
+
+    Methods
+    -------
+    __init__(master: any, appController):
+        Initializes the No Pendrive Frame with a message and buttons for retry and return to main menu.
     """
 
     def __init__(self, master: any, appController):
@@ -114,7 +156,6 @@ class FoundPendriveFrame(ctk.CTkFrame):
     """
     A class used to represent the Found Pendrive Frame of the application.
 
-    ...
 
     Methods
     -------
@@ -172,7 +213,6 @@ class PinEntryFrame(ctk.CTkFrame):
     """
     A class used to represent a Frame with a numerical keyboard and a text field for PIN entry.
 
-    ...
 
     Methods
     -------
@@ -267,7 +307,6 @@ class SelectFileToSignFrame(ctk.CTkFrame):
     """
     A class used to represent a Frame with a module to select file to sign.
 
-    ...
 
     Methods
     -------
@@ -339,8 +378,6 @@ class SelectFileToSignFrame(ctk.CTkFrame):
 class SelectFileToVerifyFrame(ctk.CTkFrame):
     """
         A class used to represent a Frame with a module to select file to verify.
-
-        ...
 
         Methods
         -------
@@ -414,7 +451,6 @@ class SelectPublicKeyFrame(ctk.CTkFrame):
     """
             A class used to represent a Frame with a module to select public key.
 
-            ...
 
             Methods
             -------
@@ -561,21 +597,28 @@ class SelectXMLFrame(ctk.CTkFrame):
 
 class VerificationResultFrame(ctk.CTkFrame):
     """
-    A class used to represent a Frame with an information about verification result.
-    """
+    A class used to represent a Frame that displays the result of a verification operation.
 
+    This Frame displays whether the verification was successful or not. It also provides an option to return to the main menu.
+
+
+    Methods
+    -------
+    __init__(master: any, appController, result: bool):
+        Initializes the VerificationResultFrame with the result of the verification operation.
+    """
     def __init__(self, master: any, appController, result: bool):
         """
         Constructs all the necessary attributes for the VerificationResultFrame object.
 
         Parameters
         ----------
-            master : any
-                The parent widget.
-            appController : any
-                The application controller.
-            result : bool
-                The result of verification.
+        master : any
+            The parent widget.
+        appController : any
+            The application controller.
+        result : bool
+            The result of the verification operation. True if the verification was successful, False otherwise.
         """
         super().__init__(master)
 
@@ -610,6 +653,11 @@ class VerificationResultFrame(ctk.CTkFrame):
 class SelectEncryptDecryptFrame(ctk.CTkFrame):
     """
     A class used to represent a Frame with two options - encrypt od decrypt
+
+    Methods
+    -------
+    __init__(master: any, appController, result: bool):
+        Initializes the SelectEncryptDecryptFrame with option to either encrypt or decrypt a file.
     """
 
     def __init__(self, master: any, appController):
@@ -666,6 +714,11 @@ class SelectEncryptDecryptFrame(ctk.CTkFrame):
 class SelectFileToEncryptFrame(ctk.CTkFrame):
     """
     A class used to represent a Frame with option to chose file to encrypt
+
+    Methods
+    -------
+    __init__(master: any, appController, filePath, isExtensionValid):
+        Initializes the SelectFileToEncryptFrame with option to choose file to encrypt.
     """
 
     def __init__(self, master: any, appController, filePath, isExtensionValid):
@@ -734,6 +787,11 @@ class SelectFileToEncryptFrame(ctk.CTkFrame):
 class SelectPublicKeyToEncryptFrame(ctk.CTkFrame):
     """
     A class used to represent a Frame with option to choose public key to encrypt
+
+    Methods
+    -------
+    __init__(master: any, appController, filePath, keyPath, isExtensionValid):
+        Initializes the SelectPublicKeyToEncryptFrame with option to choose public key to encrypt.
     """
 
     def __init__(self, master: any, appController, filePath, keyPath, isExtensionValid):
@@ -806,13 +864,10 @@ class SuccessfulOperationWithDisplay(ctk.CTkFrame):
     """
         A class used to represent a Frame with an information that some operation has been finished successfully.
 
-        ...
 
-        Methods
-        -------
-        __init__(master: any, appController, infoHeader, valueDisplayed):
-            Initializes the Frame with an information about successful operation and some displayed string in textbox.
-        """
+        Methods ------- __init__(master: any, appController, infoHeader, valueDisplayed): Initializes the Frame with
+        an information about successful operation and encrypted/decrypted string in a textbox.
+    """
     def __init__(self, master: any, appController, infoHeader, valueDisplayed):
         """
         Constructs all the necessary attributes for the SuccessfulOperationWithDisplay object.
@@ -851,6 +906,11 @@ class SuccessfulOperationWithDisplay(ctk.CTkFrame):
 class SelectFileToDecryptFrame(ctk.CTkFrame):
     """
     A class used to represent a Frame with option to chose file to decrypt
+
+    Methods
+    -------
+    __init__(master: any, appController, filePath, isExtensionValid):
+        Initializes the SelectFileToDecryptFrame with option to choose file to decrypt.
     """
 
     def __init__(self, master: any, appController, filePath, isExtensionValid):
@@ -920,7 +980,6 @@ class NoPendriveForDecryptionFrame(ctk.CTkFrame):
     """
     A class used to represent the NoPendriveForDecryptionFrame of the application.
 
-    ...
 
     Methods
     -------
@@ -971,7 +1030,6 @@ class FoundPendriveForDecryptionFrame(ctk.CTkFrame):
     """
     A class used to represent the FoundPendriveForDecryptionFrame of the application.
 
-    ...
 
     Methods
     -------

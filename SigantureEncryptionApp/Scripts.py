@@ -110,7 +110,7 @@ def is_file_valid_to_sign(file_name):
 
     Returns
     -------
-    is_file_extension_valid
+    is_file_extension_valid : bool
     """
     file_extension = file_name.split(".")[-1].lower()
     is_file_extension_valid = file_extension in ALLOWED_EXTENSIONS
@@ -239,7 +239,8 @@ def encrypt_file(filePath, keyPath):
 
         Returns
         -------
-        encrypted_content
+        encrypted_content : str
+            The string of encrypted file content.
     """
 
     with open(filePath, "rb") as file:
@@ -261,7 +262,7 @@ def encrypt_file(filePath, keyPath):
 
 def decrypt_file(filePath, key):
     """
-    Function decrypts file (filePath) using key.
+    Function decrypts file (filePath) using the key.
 
         Parameters
         ----------
@@ -282,4 +283,7 @@ def decrypt_file(filePath, key):
     cipher = PKCS1_OAEP.new(key)
     decrypted_content = cipher.decrypt(fileContent)
 
-    return decrypted_content.decode('utf-8')
+    decrypted_string = decrypted_content.decode('utf-8')
+    with open(filePath, "wb") as file:
+        file.write(decrypted_string)
+    return decrypted_string
