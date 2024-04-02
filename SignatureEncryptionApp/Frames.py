@@ -3,6 +3,10 @@ import os.path
 import customtkinter as ctk
 from PIL import Image, ImageTk
 
+additional_path = '/icons'
+if not os.path.exists(additional_path):
+    additional_path = 'SignatureEncryptionApp' + additional_path
+
 
 class HomeFrame(ctk.CTkFrame):
     """
@@ -38,27 +42,25 @@ class HomeFrame(ctk.CTkFrame):
 
         sign_button = ctk.CTkButton(self, text="Sign the document", font=("Calibri", 40), width=400, height=60,
                                     command=lambda: appController.sign_document_choosen())
-        sign_button.grid(row=1, column=0, padx=10, pady=1, columnspan=2)
+        sign_button.grid(row=1, column=0, padx=10, pady=1)
 
         validate_button = ctk.CTkButton(self, text="Verify signature", font=("Calibri", 40), width=400, height=60,
                                         command=lambda: appController.set_frame(SelectFileToVerifyFrame, None, None))
-        validate_button.grid(row=2, column=0, padx=10, pady=1, columnspan=2)
+        validate_button.grid(row=2, column=0, padx=10, pady=1)
 
         encrypt_button = ctk.CTkButton(self, text="Encryption/decryption", font=("Calibri", 40), width=400, height=60,
                                        command=lambda: appController.select_encrypt_decrypt())
-        encrypt_button.grid(row=3, column=0, padx=10, pady=1, columnspan=2)
+        encrypt_button.grid(row=3, column=0, padx=10, pady=1)
 
         about_button = ctk.CTkButton(self, text="About app", font=("Calibri", 40), width=400, height=60,
                                      command=lambda: appController.set_frame(AboutFrame))
-        about_button.grid(row=4, column=0, padx=10, pady=1, columnspan=2)
+        about_button.grid(row=4, column=0, padx=10, pady=1)
 
         img = None
-        if os.path.exists("icons/certificate.png"):
-            img = ctk.CTkImage(Image.open("icons/certificate.png"), size=(300, 300))
-        elif os.path.exists("SignatureEncryptionApp/icons/certificate.png"):
-            img = ctk.CTkImage(Image.open("icons/certificate.png"), size=(300, 300))
+        img = ctk.CTkImage(Image.open(additional_path + "/certificate.png"), size=(300, 300))
         label = ctk.CTkLabel(master=self, image=img, text="")
         label.grid(row=1, column=1, rowspan=4)
+
 
 class AboutFrame(ctk.CTkFrame):
     """
@@ -105,6 +107,8 @@ class AboutFrame(ctk.CTkFrame):
         return_button = ctk.CTkButton(self, text="Return to main menu", font=("Calibri", 30), width=300, height=50,
                                       command=lambda: appController.set_frame(HomeFrame))
         return_button.grid(row=6, column=0, padx=10, pady=10)
+
+
 class NoPendriveFrame(ctk.CTkFrame):
     """
     A class used to represent the No Pendrive Frame of the application.
@@ -136,10 +140,7 @@ class NoPendriveFrame(ctk.CTkFrame):
         label.grid(row=0, column=0, pady=20)
 
         img = None
-        if os.path.exists("icons/pendrive.png"):
-            img = ctk.CTkImage(Image.open("icons/pendrive.png"), size=(300, 300))
-        elif os.path.exists("SignatureEncryptionApp/icons/pendrive.png"):
-            img = ctk.CTkImage(Image.open("icons/pendrive.png"), size=(300, 300))
+        img = ctk.CTkImage(Image.open(additional_path + "/pendrive.png"), size=(300, 300))
 
         label = ctk.CTkLabel(master=self, image=img, text="")
         label.grid(row=1, column=0)
@@ -353,19 +354,13 @@ class SelectFileToSignFrame(ctk.CTkFrame):
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
 
                 img = None
-                if os.path.exists("icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
-                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                img = ctk.CTkImage(Image.open(additional_path + "/doc-fail.png"), size=(150, 150))
 
                 label = ctk.CTkLabel(master=self, image=img, text="")
                 label.grid(row=4, column=0)
         else:
             img = None
-            if os.path.exists("icons/file.png"):
-                img = ctk.CTkImage(Image.open("icons/file.png"), size=(300, 300))
-            elif os.path.exists("SignatureEncryptionApp/icons/file.png"):
-                img = ctk.CTkImage(Image.open("icons/file.png"), size=(300, 300))
+            img = ctk.CTkImage(Image.open(additional_path + "/file.png"), size=(300, 300))
 
             label = ctk.CTkLabel(master=self, image=img, text="")
             label.grid(row=2, rowspan=3, column=0)
@@ -425,19 +420,13 @@ class SelectFileToVerifyFrame(ctk.CTkFrame):
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
 
                 img = None
-                if os.path.exists("icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
-                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                img = ctk.CTkImage(Image.open(additional_path + "/doc-fail.png"), size=(150, 150))
 
                 label = ctk.CTkLabel(master=self, image=img, text="")
                 label.grid(row=4, column=0)
         else:
             img = None
-            if os.path.exists("icons/file.png"):
-                img = ctk.CTkImage(Image.open("icons/file.png"), size=(300, 300))
-            elif os.path.exists("SignatureEncryptionApp/icons/file.png"):
-                img = ctk.CTkImage(Image.open("icons/file.png"), size=(300, 300))
+            img = ctk.CTkImage(Image.open(additional_path + "/file.png"), size=(300, 300))
 
             label = ctk.CTkLabel(master=self, image=img, text="")
             label.grid(row=2, rowspan=3, column=0)
@@ -499,19 +488,13 @@ class SelectPublicKeyFrame(ctk.CTkFrame):
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
 
                 img = None
-                if os.path.exists("icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
-                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                img = ctk.CTkImage(Image.open(additional_path + "/doc-fail.png"), size=(150, 150))
 
                 label = ctk.CTkLabel(master=self, image=img, text="")
                 label.grid(row=4, column=0)
         else:
             img = None
-            if os.path.exists("icons/key.png"):
-                img = ctk.CTkImage(Image.open("icons/key.png"), size=(300, 300))
-            elif os.path.exists("SignatureEncryptionApp/icons/key.png"):
-                img = ctk.CTkImage(Image.open("icons/key.png"), size=(300, 300))
+            img = ctk.CTkImage(Image.open(additional_path + "/key.png"), size=(300, 300))
 
             label = ctk.CTkLabel(master=self, image=img, text="")
             label.grid(row=2, rowspan=3, column=0)
@@ -573,19 +556,13 @@ class SelectXMLFrame(ctk.CTkFrame):
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
 
                 img = None
-                if os.path.exists("icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
-                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                img = ctk.CTkImage(Image.open(additional_path + "/doc-fail.png"), size=(150, 150))
 
                 label = ctk.CTkLabel(master=self, image=img, text="")
                 label.grid(row=4, column=0)
         else:
             img = None
-            if os.path.exists("icons/certificate.png"):
-                img = ctk.CTkImage(Image.open("icons/certificate.png"), size=(300, 300))
-            elif os.path.exists("SignatureEncryptionApp/icons/certificate.png"):
-                img = ctk.CTkImage(Image.open("icons/certificate.png"), size=(300, 300))
+            img = ctk.CTkImage(Image.open(additional_path + "/certificate.png"), size=(300, 300))
 
             label = ctk.CTkLabel(master=self, image=img, text="")
             label.grid(row=2, rowspan=3, column=0)
@@ -607,6 +584,7 @@ class VerificationResultFrame(ctk.CTkFrame):
     __init__(master: any, appController, result: bool):
         Initializes the VerificationResultFrame with the result of the verification operation.
     """
+
     def __init__(self, master: any, appController, result: bool):
         """
         Constructs all the necessary attributes for the VerificationResultFrame object.
@@ -636,10 +614,7 @@ class VerificationResultFrame(ctk.CTkFrame):
             filename = "failure"
 
         img = None
-        if os.path.exists("icons/" + filename + ".png"):
-            img = ctk.CTkImage(Image.open("icons/" + filename + ".png"), size=(300, 300))
-        elif os.path.exists("SignatureEncryptionApp/icons/" + filename + ".png"):
-            img = ctk.CTkImage(Image.open("icons/" + filename + ".png"), size=(300, 300))
+        img = ctk.CTkImage(Image.open(additional_path + "/" + filename + ".png"), size=(300, 300))
 
         label = ctk.CTkLabel(master=self, image=img, text="")
         label.grid(row=1, column=0)
@@ -679,10 +654,7 @@ class SelectEncryptDecryptFrame(ctk.CTkFrame):
         self.grid_columnconfigure((0, 1), weight=1)
 
         img_locked = None
-        if os.path.exists("icons/locked.png"):
-            img_locked = ctk.CTkImage(Image.open("icons/locked.png"), size=(250, 250))
-        elif os.path.exists("SignatureEncryptionApp/icons/locked.png"):
-            img_locked = ctk.CTkImage(Image.open("icons/locked.png"), size=(250, 250))
+        img_locked = ctk.CTkImage(Image.open(additional_path + "/locked.png"), size=(250, 250))
 
         encrypt_button = ctk.CTkButton(self, image=img_locked, width=300, text="",
                                        height=300,
@@ -693,10 +665,7 @@ class SelectEncryptDecryptFrame(ctk.CTkFrame):
         label_encrypt.grid(row=2, column=0)
 
         img_unlocked = None
-        if os.path.exists("icons/unlocked.png"):
-            img_unlocked = ctk.CTkImage(Image.open("icons/unlocked.png"), size=(250, 250))
-        elif os.path.exists("SignatureEncryptionApp/icons/unlocked.png"):
-            img_unlocked = ctk.CTkImage(Image.open("icons/unlocked.png"), size=(250, 250))
+        img_unlocked = ctk.CTkImage(Image.open(additional_path + "/unlocked.png"), size=(250, 250))
 
         decrypt_button = ctk.CTkButton(self, image=img_unlocked, width=300, text="",
                                        height=300,
@@ -753,8 +722,8 @@ class SelectFileToEncryptFrame(ctk.CTkFrame):
                 text_label = ctk.CTkLabel(master=self, text="Do you want to encrypt this file?", font=("Calibri", 30))
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
                 encrypt_button = ctk.CTkButton(self, text="Next", font=("Calibri", 40), width=300,
-                                            height=50,
-                                            command=lambda: appController.selected_file_to_encrypt(filePath))
+                                               height=50,
+                                               command=lambda: appController.selected_file_to_encrypt(filePath))
                 encrypt_button.grid(row=4, column=0, pady=30, sticky="n")
             else:
                 text_label = ctk.CTkLabel(master=self, text="WRONG FILE EXTENSION", font=("Calibri", 30),
@@ -762,19 +731,13 @@ class SelectFileToEncryptFrame(ctk.CTkFrame):
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
 
                 img = None
-                if os.path.exists("icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
-                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                img = ctk.CTkImage(Image.open(additional_path + "/doc-fail.png"), size=(150, 150))
 
                 label = ctk.CTkLabel(master=self, image=img, text="")
                 label.grid(row=4, column=0)
         else:
             img = None
-            if os.path.exists("icons/locked.png"):
-                img = ctk.CTkImage(Image.open("icons/locked.png"), size=(300, 300))
-            elif os.path.exists("SignatureEncryptionApp/icons/locked.png"):
-                img = ctk.CTkImage(Image.open("icons/locked.png"), size=(300, 300))
+            img = ctk.CTkImage(Image.open(additional_path + "/locked.png"), size=(300, 300))
 
             label = ctk.CTkLabel(master=self, image=img, text="")
             label.grid(row=2, rowspan=3, column=0)
@@ -829,8 +792,8 @@ class SelectPublicKeyToEncryptFrame(ctk.CTkFrame):
                                           font=("Calibri", 30))
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
                 encrypt_button = ctk.CTkButton(self, text="Encrypt", font=("Calibri", 40), width=300,
-                                            height=50,
-                                            command=lambda: appController.encrypt_file(filePath, keyPath))
+                                               height=50,
+                                               command=lambda: appController.encrypt_file(filePath, keyPath))
                 encrypt_button.grid(row=4, column=0, pady=30, sticky="n")
             else:
                 text_label = ctk.CTkLabel(master=self, text="WRONG FILE EXTENSION", font=("Calibri", 30),
@@ -838,19 +801,13 @@ class SelectPublicKeyToEncryptFrame(ctk.CTkFrame):
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
 
                 img = None
-                if os.path.exists("icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
-                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                img = ctk.CTkImage(Image.open(additional_path + "/doc-fail.png"), size=(150, 150))
 
                 label = ctk.CTkLabel(master=self, image=img, text="")
                 label.grid(row=4, column=0)
         else:
             img = None
-            if os.path.exists("icons/key.png"):
-                img = ctk.CTkImage(Image.open("icons/key.png"), size=(300, 300))
-            elif os.path.exists("SignatureEncryptionApp/icons/key.png"):
-                img = ctk.CTkImage(Image.open("icons/key.png"), size=(300, 300))
+            img = ctk.CTkImage(Image.open(additional_path + "/key.png"), size=(300, 300))
 
             label = ctk.CTkLabel(master=self, image=img, text="")
             label.grid(row=2, rowspan=3, column=0)
@@ -868,6 +825,7 @@ class SuccessfulOperationWithDisplay(ctk.CTkFrame):
         Methods ------- __init__(master: any, appController, infoHeader, valueDisplayed): Initializes the Frame with
         an information about successful operation and encrypted/decrypted string in a textbox.
     """
+
     def __init__(self, master: any, appController, infoHeader, valueDisplayed):
         """
         Constructs all the necessary attributes for the SuccessfulOperationWithDisplay object.
@@ -945,8 +903,8 @@ class SelectFileToDecryptFrame(ctk.CTkFrame):
                 text_label = ctk.CTkLabel(master=self, text="Do you want to decrypt this file?", font=("Calibri", 30))
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
                 encrypt_button = ctk.CTkButton(self, text="Next", font=("Calibri", 40), width=300,
-                                            height=50,
-                                            command=lambda: appController.selected_file_to_decrypt(filePath))
+                                               height=50,
+                                               command=lambda: appController.selected_file_to_decrypt(filePath))
                 encrypt_button.grid(row=4, column=0, pady=30, sticky="n")
             else:
                 text_label = ctk.CTkLabel(master=self, text="WRONG FILE EXTENSION", font=("Calibri", 30),
@@ -954,19 +912,13 @@ class SelectFileToDecryptFrame(ctk.CTkFrame):
                 text_label.grid(row=2, column=0, pady=30, sticky="n")
 
                 img = None
-                if os.path.exists("icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
-                elif os.path.exists("SignatureEncryptionApp/icons/doc-fail.png"):
-                    img = ctk.CTkImage(Image.open("icons/doc-fail.png"), size=(150, 150))
+                img = ctk.CTkImage(Image.open(additional_path + "/doc-fail.png"), size=(150, 150))
 
                 label = ctk.CTkLabel(master=self, image=img, text="")
                 label.grid(row=4, column=0)
         else:
             img = None
-            if os.path.exists("icons/unlocked.png"):
-                img = ctk.CTkImage(Image.open("icons/unlocked.png"), size=(300, 300))
-            elif os.path.exists("SignatureEncryptionApp/icons/unlocked.png"):
-                img = ctk.CTkImage(Image.open("icons/unlocked.png"), size=(300, 300))
+            img = ctk.CTkImage(Image.open(additional_path + "/unlocked.png"), size=(300, 300))
 
             label = ctk.CTkLabel(master=self, image=img, text="")
             label.grid(row=2, rowspan=3, column=0)
@@ -1010,10 +962,7 @@ class NoPendriveForDecryptionFrame(ctk.CTkFrame):
         label.grid(row=0, column=0, pady=20)
 
         img = None
-        if os.path.exists("icons/pendrive.png"):
-            img = ctk.CTkImage(Image.open("icons/pendrive.png"), size=(300, 300))
-        elif os.path.exists("SignatureEncryptionApp/icons/pendrive.png"):
-            img = ctk.CTkImage(Image.open("icons/pendrive.png"), size=(300, 300))
+        img = ctk.CTkImage(Image.open(additional_path + "/pendrive.png"), size=(300, 300))
 
         label = ctk.CTkLabel(master=self, image=img, text="")
         label.grid(row=1, column=0)
