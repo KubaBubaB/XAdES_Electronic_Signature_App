@@ -3,9 +3,9 @@ import os.path
 import customtkinter as ctk
 from PIL import Image, ImageTk
 
-additional_path = '/icons'
+additional_path = 'icons'
 if not os.path.exists(additional_path):
-    additional_path = 'SignatureEncryptionApp' + additional_path
+    additional_path = 'SignatureEncryptionApp/' + additional_path
 
 
 class HomeFrame(ctk.CTkFrame):
