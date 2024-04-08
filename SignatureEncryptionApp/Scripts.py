@@ -285,5 +285,5 @@ def decrypt_file(filePath, key):
 
     decrypted_string = decrypted_content.decode('utf-8')
     with open(filePath, "wb") as file:
-        file.write(decrypted_string)
+        file.write(decrypted_content)
     return decrypted_string

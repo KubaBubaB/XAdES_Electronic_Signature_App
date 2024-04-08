@@ -8,7 +8,7 @@ This application uses RSA and AES algorithms is designed to implement the XAdES 
 
 This console application is responsible for generating private and public key. It emulates Trusted Third Party (TTP). Private key is generated with custom PIN.
 ## SignatureEncryptionApp
-This application uses RSA algorithm and provides the following functionalities to .txt or .cpp files:
+This application uses RSA algorithm and provides the following functionalities to SMALL .txt or .cpp files:
 - Signing a document with the private key, after providing the correct PIN
 - Verify a signature with the public key
 - Encryption of a small document with the public key
